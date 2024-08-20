@@ -1,4 +1,4 @@
- name: Delivery to S3
+name: Delivery to S3
 
 on:
   push:
