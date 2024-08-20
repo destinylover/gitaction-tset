@@ -1,6 +1,6 @@
- name: Delivery to S3
+name: Delivery to S3
 
-on:
+on:  # 이벤트 트리거
   push:
     branches:
       - release/**  # release/ 경로 아래의 브랜치에 푸시 또는 병합될 때 실행
