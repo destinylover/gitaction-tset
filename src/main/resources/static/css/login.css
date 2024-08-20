@@ -1,0 +1,106 @@
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #fff;
+    position: relative;
+}
+
+.container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.page-text {
+    font-size: 24px;
+    color: #333;
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 325px;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="text"] {
+    width: 90%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 16px;
+    background-color: #e0e0e0;
+    color: #6c6c6c;
+}
+
+.login-button {
+    display: inline-block;
+    background-color: #8a8fff;
+    color: #fff;
+    padding: 15px 30px;
+    border-radius: 10px;
+    font-size: 18px;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    width: 45%;
+    margin-top: 20px;
+}
+
+.another-title-text {
+    position: absolute;
+    top: 10%;
+    font-size: 24px;
+    color: #333;
+}
+
+.title-text {
+    position: absolute;
+    top: 1%;
+    font-size: 24px;
+    color: #333;
+}
+
+.link-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.signup-link,
+.forgot-password-link {
+    color: #8a8fff;
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.signup-link:hover,
+.forgot-password-link:hover {
+    text-decoration: underline;
+}
+
+.back-button {
+    position: absolute;
+    top: -5px; /* 조정된 위치 */
+    left: -5px; /* 조정된 위치 */
+}
+
+.back-button-image {
+    width: 80px;
+    height: 80px;
+    cursor: pointer;
+}

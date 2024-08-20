@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>register</title>
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+<div class="title-text">
+    <h2>교육용 튜터 챗봇 웹앱</h2>
+</div>
+<div class="container">
+
+    <div class="form-container">
+        <div class="page-text">
+            <h3>회원가입</h3>
+        </div>
+        <a href="index.html" class="back-button">
+            <img src="img/backimage.png" alt="뒤로가기" class="back-button-image">
+        </a>
+        <form id="signupForm">
+            <label>
+                <input type="email" name="email" placeholder="이메일 주소" required>
+            </label>
+            <label>
+                <input type="password" name="password" placeholder="비밀번호" required>
+            </label>
+            <label>
+                <input type="password" name="confirmPassword" placeholder="비밀번호 확인" required>
+            </label>
+            <label>
+                <input type="number" name="age" placeholder="나이" required>
+            </label>
+            <label>
+                <input type="text" name="job" placeholder="직업" required>
+            </label>
+            <div class="education">
+                <label>최종학력</label>
+                <label><input type="radio" name="educationLevel" value="초등" required> 초등</label>
+                <label><input type="radio" name="educationLevel" value="중등" required> 중등</label>
+                <label><input type="radio" name="educationLevel" value="고등" required> 고등</label>
+                <label><input type="radio" name="educationLevel" value="대학" required> 대학</label>
+            </div>
+            <button type="submit" class="login-button">가입하기</button>
+        </form>
+    </div>
+</div>
+</body>
+<script src="js/signup.js"></script>
+</html>

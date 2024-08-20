@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>홈 화면</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/fileupload.css">
+    <link rel="stylesheet" href="css/quiz.css">
+</head>
+<body>
+<div class="container">
+    <div class="sidebar-first">
+        <div class="sidebar-header">학습 주제</div>
+        <div class="subject-list">
+            <!-- 학습 주제 리스트가 이곳에 표시됩니다. -->
+        </div>
+        <div class="sidebar-footer">
+            <button id="logout-button" class="logout-button">로그아웃</button>
+        </div>
+    </div>
+    <div class="main-content">
+        <div class="content-header">메인</div>
+        <div class="content-display" id="content-display">
+        </div>
+        <div class="action-buttons">
+            <button class="upload-button" onclick="toggleModal('upload-modal')">파일 업로드</button>
+            <button id="summary-button" onclick="showSummary()">요약</button>
+            <button id="start-quiz-button" onclick="toggleModal('quiz-modal')">문제 생성</button>
+            <button id="review-button" onclick="review()">복습</button>
+        </div>
+    </div>
+    <div class="sidebar-second">
+        <div class="sidebar-header">문제 모음</div>
+        <div class="question-list" id="question-list">
+            <!-- 문제 리스트가 이곳에 표시됩니다. -->
+        </div>
+        <div class="sidebar-footer">
+            <button id="favorites-button" onclick="findFavorites()">즐겨찾기</button>
+            <button id="incorrect-button" onclick="showIncorrectQuestions()">오답</button>
+        </div>
+    </div>
+</div>
+
+<!-- 파일 업로드 모달 -->
+<div id="upload-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>파일 업로드</h3>
+            <span class="close" onclick="toggleModal('upload-modal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="file-upload-form" action="/api/upload" method="post" enctype="multipart/form-data">
+                <div id="drop-area">
+                    <p>파일을 드래그해서 업로드하세요.</p>
+                </div>
+                <input type="file" id="file-input" name="file" class="file-input" accept="application/pdf">
+                <button type="submit" class="upload-button">업로드</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 문제 수정 요청 모달 -->
+<div id="edit-quiz-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>문제 수정 요청</h3>
+            <span class="close" onclick="toggleModal('edit-quiz-modal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <textarea id="edit-reason" placeholder="수정 요청 사유를 입력하세요..."></textarea>
+            <div class="button-container">
+                <button onclick="submitEditRequest()">제출</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 문제 생성 모달 -->
+<div id="quiz-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>문제 개수 선택</h3>
+            <span class="close" onclick="toggleModal('quiz-modal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="square-border">
+                <div class="checkbox-grid">
+                    <label><input type="radio" name="quiz-count" value="5" checked> 5개</label>
+                    <label><input type="radio" name="quiz-count" value="10"> 10개</label>
+                    <label><input type="radio" name="quiz-count" value="20"> 20개</label>
+                    <label><input type="radio" name="quiz-count" value="25"> 25개</label>
+                </div>
+            </div>
+            <div class="button-section">
+                <button onclick="confirmQuiz()">확인</button>
+                <button onclick="toggleModal('quiz-modal')">취소</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 주제 편집 모달 -->
+<div id="edit-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>주제 편집</h3>
+            <span class="close" onclick="toggleModal('edit-modal')">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="edit-form">
+                <input type="hidden" id="edit-subject-id">
+                <div>
+                    <label for="edit-subject-name">새 이름:</label>
+                    <input type="text" id="edit-subject-name" required>
+                </div>
+                <button type="submit" class="edit-button">이름 바꾸기</button>
+                <button type="button" class="delete-button" onclick="deleteSubject()">삭제</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<script src="js/ui-handlers.js"></script>
+<script src="js/quiz-functions.js"></script>
+<script src="js/api-handlers.js"></script>
+<script src="js/modal.js"></script>
+<script src="js/session-check.js"></script>
+</body>
+</html>
