@@ -1,6 +1,6 @@
 name: Delivery to S3
 
-on:  # 이벤트 트리거
+on:
   push:
     branches:
       - release/**  # release/ 경로 아래의 브랜치에 푸시 또는 병합될 때 실행
@@ -19,9 +19,11 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Make Gradle Wrapper executable
+        run: chmod +x ./gradlew
+
       - name: Build with Gradle
-        run: |
-          ./gradlew clean test bootJar
+        run: ./gradlew clean test bootJar
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -31,5 +33,4 @@ jobs:
           aws-region: ap-northeast-2  # 사용할 AWS 리전
 
       - name: Delivery to S3
-        run: |
-          aws s3 cp build/custom-libs/*.jar s3://aichat-s3/
+        run: aws s3 cp build/custom-libs/*.jar s3://aichat-s3/
