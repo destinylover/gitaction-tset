@@ -45,13 +45,15 @@ jobs:
         run: |
           # 배포를 위한 대상 변수 선언
           INSTANCE_IDS=("i-0d01ec117d707e7fa" "i-0de335f5d7d39eae2")  # EC2 인스턴스 ID 목록
-          KEY_PATH="/c/Users/teogi/.ssh/devops-ggoggoya.pem"  # SSH 키 경로
+          KEY_PATH="$HOME/.ssh/your-key.pem"  # SSH 키 경로
           S3_BUCKET_NAME="aichat-s3"  # S3 버킷 이름
+          
 
           # EC2 배포 함수 선언
           deploy_on_ec2() {
             INSTANCE_ID=$1
             PUBLIC_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[*].Instances[*].PublicIpAddress" --output text)
+          PUBLIC_IP=$(echo $PUBLIC_IP | tr -d '\r') 
 
             # Install JDK on EC2 instance if not already installed
             ssh -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << 'EOF'
