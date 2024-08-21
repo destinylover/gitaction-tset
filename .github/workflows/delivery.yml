@@ -54,7 +54,7 @@ jobs:
             PUBLIC_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[*].Instances[*].PublicIpAddress" --output text)
 
             # Install JDK on EC2 instance if not already installed
-            ssh -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << "EOF"
+            ssh -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << 'EOF'
               if ! java -version 2>&1 | grep -q "17"; then
                 sudo apt update
                 sudo apt install -y openjdk-17-jdk
@@ -64,7 +64,7 @@ jobs:
 EOF
 
             # Copy the latest JAR file from S3 to EC2 instance
-            ssh -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << "EOF"
+            ssh -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << 'EOF'
               S3_BUCKET="s3://$S3_BUCKET_NAME/"
               LATEST_FILE=$(aws s3 ls "$S3_BUCKET/" --recursive | sort | tail -n 1 | awk '{print $4}')
               if [ -n "$LATEST_FILE" ]; then
@@ -79,13 +79,13 @@ EOF
 EOF
 
             # Create necessary directories
-            ssh -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << "EOF"
+            ssh -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << 'EOF'
               sudo mkdir -p /var/logs/spring
               sudo mkdir -p /home/ubuntu/logrotate_config
 EOF
 
             # Run the application
-            ssh -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << "EOF"
+            ssh -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << 'EOF'
               nohup java -jar /home/ubuntu/$DOWNLOADED_FILE > /var/logs/spring/app.log 2>&1 &
 EOF
           }
