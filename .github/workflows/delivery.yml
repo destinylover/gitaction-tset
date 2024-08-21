@@ -44,8 +44,8 @@ jobs:
       - name: Deploy to EC2
         run: |
           # 배포를 위한 대상 변수 선언
-          INSTANCE_IDS=("i-0de335f5d7d39eae2" "i-0d01ec117d707e7fa")  # EC2 인스턴스 ID
-          KEY_PATH="/home/runner/.ssh/your-key.pem"  # SSH 키 경로
+          INSTANCE_IDS=("i-0de335f5d7d39eae2" "i-0d01ec117d707e7fa")  # 사용자의 EC2 인스턴스 ID
+          KEY_PATH="/c/Users/teogi/.ssh/devops-ggoggoya.pem"  # GitHub Actions 런너에서 접근할 수 있는 SSH 키 경로
           S3_BUCKET_NAME="aichat-s3"  # S3 버킷 이름
 
           # EC2 배포 함수 선언
@@ -63,19 +63,20 @@ jobs:
               fi
 EOF
 
-            # Copy the latest JAR file from S3 to EC2 instance
+            # Copy the JAR file from S3 to EC2 instance
             ssh -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << EOF
-              S3_BUCKET="s3://$S3_BUCKET_NAME/"
-              LATEST_FILE=$(aws s3 ls "$S3_BUCKET/" --recursive | sort | tail -n 1 | awk '{print $4}')
-              if [ -n "$LATEST_FILE" ]; then
-                  aws s3 cp "$S3_BUCKET/$LATEST_FILE" /home/ubuntu/
-                  echo "Downloaded file: $LATEST_FILE"
-              else
-                  echo "No file found in the specified S3 directory."
-                  exit 1
-              fi
-              DOWNLOADED_FILE="$LATEST_FILE"
-              echo "Variable DOWNLOADED_FILE set to: $DOWNLOADED_FILE"
+            S3_BUCKET="s3://aichat-s3/"
+            LATEST_FILE=$(aws s3 ls "$S3_BUCKET/" --recursive | sort | tail -n 1 | awk '{print $4}')
+            if [ -n "$LATEST_FILE" ]; then
+    aws s3 cp "$S3_BUCKET/$LATEST_FILE" .
+    echo "Downloaded file: $LATEST_FILE"
+else
+    echo "No file found in the specified S3 directory."
+    exit 1
+fi
+DOWNLOADED_FILE="$LATEST_FILE"
+echo "Variable DOWNLOADED_FILE set to: $DOWNLOADED_FILE"
+
 EOF
 
             # Create necessary directories
@@ -86,7 +87,7 @@ EOF
 
             # Run the application
             ssh -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << EOF
-              nohup java -jar /home/ubuntu/$DOWNLOADED_FILE > /var/logs/spring/app.log 2>&1 &
+              nohup java -jar /home/ubuntu/$JAR_FILE_NAME > /var/logs/spring/app.log 2>&1 &
 EOF
           }
 
