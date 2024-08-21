@@ -3,7 +3,7 @@ name: Delivery to S3 and Deploy to EC2
 on:
   push:
     branches:
-      - release/**  # release/로 시작하는 브랜치에 푸시 또는 병합될 때 워크플로우 실행H
+      - release/**  # release/로 시작하는 브랜치에 푸시 또는 병합될 때 워크플로우 실행
 
 jobs:
   build-and-delivery:
@@ -44,8 +44,8 @@ jobs:
       - name: Deploy to EC2
         run: |
           # 배포를 위한 대상 변수 선언
-          INSTANCE_IDS=("i-0de335f5d7d39eae2" "i-0d01ec117d707e7fa")  # EC2 인스턴스 ID
-          KEY_PATH="/home/runner/.ssh/your-key.pem"  # SSH 키 경로
+          INSTANCE_IDS=("i-0d01ec117d707e7fa" "i-0de335f5d7d39eae2")  # EC2 인스턴스 ID 목록
+          KEY_PATH="$HOME/.ssh/your-key.pem"  # SSH 키 경로
           S3_BUCKET_NAME="aichat-s3"  # S3 버킷 이름
 
           # EC2 배포 함수 선언
@@ -54,7 +54,7 @@ jobs:
             PUBLIC_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[*].Instances[*].PublicIpAddress" --output text)
 
             # Install JDK on EC2 instance if not already installed
-            ssh -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << EOF
+            ssh -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << 'EOF'
               if ! java -version 2>&1 | grep -q "17"; then
                 sudo apt update
                 sudo apt install -y openjdk-17-jdk
@@ -63,30 +63,30 @@ jobs:
               fi
 EOF
 
-            # Copy the latest JAR file from S3 to EC2 instance
+            # Find the latest JAR file in S3 and copy it to EC2 instance
             ssh -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << EOF
-              S3_BUCKET="s3://$S3_BUCKET_NAME/"
-              LATEST_FILE=\$(aws s3 ls "\$S3_BUCKET" --recursive | sort | tail -n 1 | awk '{print \$4}')
-              if [ -n "\$LATEST_FILE" ]; then
-                aws s3 cp "\$S3_BUCKET\$LATEST_FILE" /home/ubuntu/
-                echo "Downloaded file: \$LATEST_FILE"
+              # Find the most recent JAR file in the S3 bucket
+              LATEST_JAR=$(aws s3 ls s3://$S3_BUCKET_NAME/ --recursive | grep '.jar' | sort | tail -n 1 | awk '{print $4}')
+              
+              if [ -n "$LATEST_JAR" ]; then
+                aws s3 cp s3://$S3_BUCKET_NAME/$LATEST_JAR /home/ubuntu/
+                echo "Downloaded file: $LATEST_JAR"
+                JAR_FILE_NAME=$LATEST_JAR
               else
-                echo "No file found in the specified S3 directory."
+                echo "No JAR file found in the S3 bucket."
                 exit 1
               fi
-              DOWNLOADED_FILE="\$LATEST_FILE"
-              echo "Variable DOWNLOADED_FILE set to: \$DOWNLOADED_FILE"
 EOF
 
             # Create necessary directories
-            ssh -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << EOF
+            ssh -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << 'EOF'
               sudo mkdir -p /var/logs/spring
               sudo mkdir -p /home/ubuntu/logrotate_config
 EOF
 
-            # Run the application
+            # Run the application with the latest JAR file
             ssh -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << EOF
-              nohup java -jar /home/ubuntu/\$DOWNLOADED_FILE > /var/logs/spring/app.log 2>&1 &
+              nohup java -jar /home/ubuntu/$JAR_FILE_NAME > /var/logs/spring/app.log 2>&1 &
 EOF
           }
 
