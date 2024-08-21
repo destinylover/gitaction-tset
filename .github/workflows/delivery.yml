@@ -54,7 +54,7 @@ jobs:
             PUBLIC_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[*].Instances[*].PublicIpAddress" --output text)
 
             # Install JDK on EC2 instance if not already installed
-            ssh -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << 'EOF'
+            ssh -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << EOF
               if ! java -version 2>&1 | grep -q "17"; then
                 sudo apt update
                 sudo apt install -y openjdk-17-jdk
@@ -79,7 +79,7 @@ EOF
 EOF
 
             # Create necessary directories
-            ssh -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << 'EOF'
+            ssh -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << EOF
               sudo mkdir -p /var/logs/spring
               sudo mkdir -p /home/ubuntu/logrotate_config
 EOF
