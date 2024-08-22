@@ -3,7 +3,7 @@ name: Delivery to S3
 on:
   push:
     branches:
-      - release/**  # release/로 시작하는 브랜치에 푸시 또는 병합될 때 워크플로우 실행2
+      - release/**  # release/로 시작하는 브랜치에 푸시 또는 병합될 때 워크플로우 실행
 
 jobs:
   build-and-delivery:
@@ -43,13 +43,13 @@ jobs:
 
       - name: Deploy to EC2
         run: |
-          INSTANCE_IDS=("i-0de335f5d7d39eae2")  # EC2 인스턴스 ID 목록
+          INSTANCE_ID=("i-0de335f5d7d39eae2")  # EC2 인스턴스 ID 목록
           KEY_PATH="~/.ssh/your-key.pem"  # SSH 키 경로
           S3_BUCKET_NAME="aichat-s3"  # S3 버킷 이름
           
           # EC2 배포 함수 선언
           deploy_on_ec2() {
-            INSTANCE_IDS=$1
+            INSTANCE_ID=$1
             PUBLIC_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[*].Instances[*].PublicIpAddress" --output text)
             PUBLIC_IP=$(echo $PUBLIC_IP | tr -d '\r') 
 
@@ -91,6 +91,6 @@ jobs:
           }
 
           # 배포 함수 호출
-          for INSTANCE_ID in "${INSTANCE_IDS[@]}"; do
+          for INSTANCE_ID in "${INSTANCE_ID[@]}"; do
             deploy_on_ec2 $INSTANCE_ID
           done
