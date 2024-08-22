@@ -51,8 +51,8 @@ jobs:
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v0.1.5
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
+          host: 43.202.245.31
+          username: ec2-user
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
               echo "Downloading new JAR file..."
