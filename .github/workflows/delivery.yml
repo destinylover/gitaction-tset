@@ -32,8 +32,9 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
 
-      - name: Upload JAR to S3
-        run: aws s3 cp build/libs/your-app.jar s3://aichat-s3/your-app.jar
+      - name: Delivery to S3
+        run: aws s3 cp build/custom-libs/*.jar s3://aichat-s3/
+
 
       - name: Get the most recent JAR file from S3
         id: get_latest_jar
@@ -45,6 +46,7 @@ jobs:
       - name: Download JAR from S3
         run: |
           aws s3 cp s3://aichat-s3/${{ env.LATEST_JAR }} ./your-file.jar
+          
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v0.1.5
@@ -53,9 +55,11 @@ jobs:
           username: ec2-user
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            echo "Downloading new JAR file..."
+            aws s3 cp s3://aichat-s3/${{ env.LATEST_JAR }} ~/your-app.jar
             echo "Stopping existing service..."
             sudo systemctl stop your-service || true
             echo "Replacing old JAR..."
-            sudo cp ~/your-file.jar /path/to/your/old-file.jar
+            sudo cp ~/your-app.jar ~/your-old-file.jar
             echo "Starting service..."
-            sudo systemctl start your-service
+            sudo systemctl start your-servic
