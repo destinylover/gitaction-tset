@@ -48,15 +48,15 @@ jobs:
           KEY_PATH="$HOME/.ssh/your-key.pem"  # SSH 키 경로
           S3_BUCKET_NAME="aichat-s3"  # S3 버킷 이름
           
-
+          
           # EC2 배포 함수 선언
           deploy_on_ec2() {
             INSTANCE_ID=$1
             PUBLIC_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[*].Instances[*].PublicIpAddress" --output text)
-          PUBLIC_IP=$(echo $PUBLIC_IP | tr -d '\r') 
+            PUBLIC_IP=$(echo $PUBLIC_IP | tr -d '\r') 
 
             # Install JDK on EC2 instance if not already installed
-            ssh -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << 'EOF'
+            ssh -T -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << 'EOF'
               if ! java -version 2>&1 | grep -q "17"; then
                 sudo apt update
                 sudo apt install -y openjdk-17-jdk
@@ -66,10 +66,10 @@ jobs:
           EOF
 
             # Find the latest JAR file in S3 and copy it to EC2 instance
-            ssh -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << EOF
+            ssh -T -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << EOF
               # Find the most recent JAR file in the S3 bucket
               LATEST_JAR=$(aws s3 ls s3://$S3_BUCKET_NAME/ --recursive | grep '.jar' | sort | tail -n 1 | awk '{print $4}')
-              
+          
               if [ -n "$LATEST_JAR" ]; then
                 aws s3 cp s3://$S3_BUCKET_NAME/$LATEST_JAR /home/ubuntu/
                 echo "Downloaded file: $LATEST_JAR"
@@ -81,13 +81,13 @@ jobs:
           EOF
 
             # Create necessary directories
-            ssh -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << 'EOF'
+            ssh -T -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << 'EOF'
               sudo mkdir -p /var/logs/spring
               sudo mkdir -p /home/ubuntu/logrotate_config
           EOF
 
             # Run the application with the latest JAR file
-            ssh -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << EOF
+            ssh -T -o StrictHostKeyChecking=no -i $KEY_PATH ubuntu@$PUBLIC_IP << EOF
               nohup java -jar /home/ubuntu/$JAR_FILE_NAME > /var/logs/spring/app.log 2>&1 &
           EOF
           }
