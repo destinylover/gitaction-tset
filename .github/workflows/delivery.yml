@@ -1,36 +1,51 @@
-name: Delivery to S3
+name: Deploy to EC2
 
 on:
   push:
     branches:
-      - release/**  # release/로 시작하는 브랜치에 푸시 또는 병합될 때 워크플로우 실행
+      - main
 
 jobs:
-  build-and-delivery:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up JDK
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Make Gradle Wrapper executable
-        run: chmod +x ./gradlew
-
-      - name: Build with Gradle
-        run: ./gradlew clean -x test bootJar
-
-      - name: Configure AWS credentials
+      - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-2
+          aws-region: us-west-2
 
-      - name: Delivery to S3
-        run: aws s3 cp build/custom-libs/*.jar s3://aichat-s3/
+      - name: Get the most recent JAR file from S3
+        id: get_latest_jar
+        run: |
+          latest_jar=$(aws s3api list-objects-v2 --bucket aichat-s3 --query "Contents[?ends_with(Key, '.jar')].[Key,LastModified]" --output text | sort -k2,2r | head -n 1 | awk '{print $1}')
+          echo "Latest JAR file: $latest_jar"
+          echo "LATEST_JAR=$latest_jar" >> $GITHUB_ENV
+
+      - name: Download JAR from S3
+        run: |
+          aws s3 cp s3://aichat-s3/${{ env.LATEST_JAR }} ./your-file.jar
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: 43.202.245.31  # 퍼블릭 IP 주소
+          username: ec2-user   # 기본 사용자 이름
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            echo "Stopping existing service..."
+            sudo systemctl stop your-service || true
+            
+            echo "Removing old JAR..."
+            sudo rm -f /path/to/your/old-file.jar
+            
+            echo "Copying new JAR..."
+            sudo cp ~/your-file.jar /path/to/your/new-file.jar
+            
+            echo "Starting service..."
+            sudo systemctl start your-service
