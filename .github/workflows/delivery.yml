@@ -46,22 +46,20 @@ jobs:
       - name: Download JAR from S3
         run: |
           aws s3 cp s3://aichat-s3/${{ env.LATEST_JAR }} ./your-file.jar
+          
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v0.1.5
         with:
-          host: 43.202.245.31  # 퍼블릭 IP 주소
-          username: ec2-user   # 기본 사용자 이름
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            echo "Stopping existing service..."
-            sudo systemctl stop your-service || true
-            
-            echo "Removing old JAR..."
-            sudo rm -f /path/to/your/old-file.jar
-            
-            echo "Copying new JAR..."
-            sudo cp ~/your-file.jar /path/to/your/new-file.jar
-            
-            echo "Starting service..."
-            sudo systemctl start your-service
+              echo "Downloading new JAR file..."
+              aws s3 cp s3://your-bucket/your-app.jar /home/ec2-user/your-app.jar
+              echo "Stopping existing service..."
+              sudo systemctl stop your-service || true
+              echo "Replacing old JAR..."
+              sudo cp /home/ec2-user/your-app.jar /path/to/your/old-file.jar
+              echo "Starting service..."
+              sudo systemctl start your-service
