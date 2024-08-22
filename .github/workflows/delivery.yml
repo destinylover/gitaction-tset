@@ -1,4 +1,4 @@
-name: Delivery to S3 and Deploy to EC2
+name: Delivery to S3
 
 on:
   push:
@@ -49,7 +49,7 @@ jobs:
           
           # EC2 배포 함수 선언
           deploy_on_ec2() {
-            INSTANCE_ID=$1
+            INSTANCE_IDS=$1
             PUBLIC_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[*].Instances[*].PublicIpAddress" --output text)
             PUBLIC_IP=$(echo $PUBLIC_IP | tr -d '\r') 
 
