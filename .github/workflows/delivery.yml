@@ -45,7 +45,7 @@ jobs:
         run: |
           # 배포를 위한 대상 변수 선언
           INSTANCE_IDS=("i-0de335f5d7d39eae2")  # EC2 인스턴스 ID 목록
-          KEY_PATH="$HOME/.ssh/your-key.pem"  # SSH 키 경로
+          KEY_PATH="~/.ssh/your-key.pem"  # SSH 키 경로
           S3_BUCKET_NAME="aichat-s3"  # S3 버킷 이름
           
           
