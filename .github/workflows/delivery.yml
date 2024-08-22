@@ -41,48 +41,48 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           # 배포를 위한 대상 변수 선언
-          INSTANCE_IDS=("i-0de335f5d7d39eae2")  # EC2 인스턴스 ID 목록 (AWS 환경변수로 등록해서 참조)
-          S3_BUCKET_NAME="aichat-s3"  # S3 버킷 이름
-          
+          INSTANCE_IDS=("i-0de335f5d7d39eae2")
+          S3_BUCKET_NAME="aichat-s3"
+
           # Prepare SSH key for use
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          
+
           # EC2 배포 함수 선언
           deploy_on_ec2() {
             INSTANCE_ID=$1
             PUBLIC_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query "Reservations[*].Instances[*].PublicIpAddress" --output text)
-          
+
             # Find the most recent JAR file in the S3 bucket
             JAR_FILE_NAME=$(aws s3api list-objects-v2 --bucket $S3_BUCKET_NAME --query "Contents[?contains(Key, '.jar')].{Key: Key, LastModified: LastModified} | sort_by(@, &LastModified) | [-1].Key" --output text)
             echo "Latest JAR file in S3: $JAR_FILE_NAME"
 
             # Install JDK on EC2 instance if not already installed
             ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@$PUBLIC_IP << 'EOF'
-              if ! java -version 2>&1 | grep -q "17"; then
-                sudo apt update
-                sudo apt install -y openjdk-17-jdk
-              else
-                echo "JDK 17 is already installed."
-              fi
-            EOF
-          
+          if ! java -version 2>&1 | grep -q "17"; then
+            sudo apt update
+            sudo apt install -y openjdk-17-jdk
+          else
+            echo "JDK 17 is already installed."
+          fi
+          EOF
+
             # Copy the JAR file from S3 to EC2 instance
             ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@$PUBLIC_IP << EOF
-              aws s3 cp s3://$S3_BUCKET_NAME/$JAR_FILE_NAME /home/ec2-user/
-            EOF
-          
+          aws s3 cp s3://$S3_BUCKET_NAME/$JAR_FILE_NAME /home/ec2-user/
+          EOF
+
             # Create necessary directories
             ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@$PUBLIC_IP << 'EOF'
-              sudo mkdir -p /var/logs/spring
-              sudo mkdir -p /home/ec2-user/logrotate_config
-            EOF
-          
+          sudo mkdir -p /var/logs/spring
+          sudo mkdir -p /home/ec2-user/logrotate_config
+          EOF
+
             # Run the application
             ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@$PUBLIC_IP << EOF
-              nohup java -jar /home/ec2-user/$JAR_FILE_NAME > /var/logs/spring/app.log 2>&1 &
-            EOF
+          nohup java -jar /home/ec2-user/$JAR_FILE_NAME > /var/logs/spring/app.log 2>&1 &
+          EOF
           }
 
           # 배포 함수 호출
