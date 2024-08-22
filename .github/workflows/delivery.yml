@@ -45,6 +45,7 @@ jobs:
           S3_BUCKET_NAME="aichat-s3"  # S3 버킷 이름
           
           # Prepare SSH key for use
+          mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           
