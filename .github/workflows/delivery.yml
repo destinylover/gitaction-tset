@@ -1,24 +1,40 @@
-name: Deploy to EC2
+name: Delivery to S3
 
 on:
   push:
     branches:
-      - main
+      - release/**  # release/로 시작하는 브랜치에 푸시 또는 병합될 때 워크플로우 실행
 
 jobs:
-  deploy:
+  build-and-delivery:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up AWS CLI
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Make Gradle Wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew clean -x test bootJar
+
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-west-2
+          aws-region: ap-northeast-2
+
+      - name: Delivery to S3
+        run: aws s3 cp build/custom-libs/*.jar s3://aichat-s3/
+
 
       - name: Get the most recent JAR file from S3
         id: get_latest_jar
