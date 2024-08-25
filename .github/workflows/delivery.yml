@@ -41,7 +41,7 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           # 배포를 위한 대상 변수 선언
-          INSTANCE_IDS=("i-0414f6f0bf79362c6")
+          INSTANCE_IDS=("i-0de335f5d7d39eae2")
           S3_BUCKET_NAME="aichat-s3"
 
           # Prepare SSH key for use
