@@ -59,12 +59,12 @@ jobs:
 
           
             # Copy the JAR file from S3 to EC2 instance
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@$PUBLIC_IP << 'EOF'
+            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -vvv ec2-user@$PUBLIC_IP << EOF
           aws s3 cp s3://aichat-s3/$JAR_FILE_NAME /home/ec2-user/
           EOF
 
             # Create necessary directories
-            ssh -tt -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@$PUBLIC_IP << 'EOF'
+            ssh -tt -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -vvv ec2-user@$PUBLIC_IP << 'EOF'
           sudo mkdir -p /var/logs/spring
           sudo mkdir -p /home/ec2-user/logrotate_config
           EOF
