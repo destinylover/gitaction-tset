@@ -3,7 +3,7 @@ name: Delivery to S3 # ec2 배포 과정에서 버그로 s3만 적용
 on:
   push:
     branches:
-      - release/**  # CI_CD/로 시작하는 브랜치에 푸시 또는 병합될 때 워크플로우 실행32
+      - release/**  # CI_CD/로 시작하는 브랜치에 푸시 또는 병합될 때 워크플로우 실행32ㅈ
       # 배포 확인 후 main으로 변경
 
 jobs:
