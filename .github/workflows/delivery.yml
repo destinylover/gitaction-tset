@@ -62,8 +62,8 @@ jobs:
             ssh -tt -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -vvv ec2-user@$PUBLIC_IP << 'EOF'
             echo "Running JDK installation script..."
           if ! java -version 2>&1 | grep -q "17"; then
-            sudo apt update
-            sudo apt install -y openjdk-17-jdk
+            sudo yum update -y
+            sudo yum install -y java-17-openjdk
           else
             echo "JDK 17 is already installed."
           fi
