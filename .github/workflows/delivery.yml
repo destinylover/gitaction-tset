@@ -61,7 +61,7 @@ jobs:
           
             # Copy the JAR file from S3 to EC2 instance
             ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@$PUBLIC_IP << 'EOF'
-          aws s3 cp s3://aichat-s3/$JAR_FILE_NAME /home/ec2-user/
+          aws s3 cp s3://aichat-s3/chatbot-prj-240821_0704-no_db.jar /home/ec2-user/
           EOF
 
             # Create necessary directories
