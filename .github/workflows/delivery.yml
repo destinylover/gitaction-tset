@@ -1,5 +1,4 @@
-name: Delivery to S3 # ec2 배포 과정에서 버그로 s3만 적용 권한수정12
-
+name: Delivery to S3 # ec2 배포 과정에서 버그로 s3만 적용 권한수정
 on:
   push:
     branches:
