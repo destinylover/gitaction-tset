@@ -63,7 +63,7 @@ jobs:
             echo "Running JDK installation script..."
           if ! java -version 2>&1 | grep -q "17"; then
             sudo yum update -y
-            sudo yum install -y java-17-openjdk
+            sudo yum install -y java-17-amazon-corretto-devel
           else
             echo "JDK 17 is already installed."
           fi
